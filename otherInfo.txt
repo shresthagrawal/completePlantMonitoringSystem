@@ -1,0 +1,29 @@
+#mapping for sensor log 
+PUT sensor-logs
+{
+    "settings" : {
+        "number_of_shards" : 1
+    },
+    "mappings" : {
+        "_doc" : {
+            "properties" : {
+                "NodeId": {"type": "keyword"},
+			    "TimeStamp": {"type": "date"},
+			    "MotionStatus": {"type": "integer"},
+			    "LDR": {"type": "integer"},
+			    "AlcoholGas": {"type": "integer"},
+			    "Temperature": {"type": "integer"},
+			    "Humidity": {"type": "integer"},
+			    "HydrogenGas": {"type": "integer"}
+            }
+        }
+    }
+}
+
+# Query for all documents 
+POST localhost:9200/sensor-logs/_search?
+# Querry to get mapping
+GET localhost:9200/sensor-logs/_mapping/
+# TO list all indices
+GET localhost:9200/_cat/indices?v
+
