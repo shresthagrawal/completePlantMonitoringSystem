@@ -22,8 +22,8 @@ int pirSensor = 11; // PIR sensor
 int hydrogenSensor = A5; // Hydrogen Sensor
 int alcoholSensor = A4; // Alcohol Sensor
 int ldrSensor= A3; 
-int defaultLedPin = 13;
-int redLedPin = 12;
+int defaultLedPin = 12;
+int redLedPin = 13;
 int buzzerPin = 6;
 int motorPin = 10;
 int pumpPin = 9;
@@ -75,6 +75,7 @@ void loop(){
   float hydrogenVal = analogRead(hydrogenSensor); //hydrogen values
   float alcoholVal = analogRead(alcoholSensor); //alcohol values
 
+
   //get current Time Stamp
   Serial.println("GettingTimestamp...");
   //Send request to the NodeMCU using serial commmand
@@ -86,12 +87,12 @@ void loop(){
   deserializeJson(doc, Serial1.readString());
   JsonObject obj = doc.as<JsonObject>();
   String timeStamp= (obj["datetime"].as<String>());
-  //get the TimeStamp*/
+  //get the TimeStamp
   Serial.println(timeStamp);
   //exit if time stamp was not found
   if(timeStamp.equals("null")) return;
   //get The Json String for sending request
-  generateFakeData(motionStatus,ldrVal, hydrogenVal, alcoholVal, temperatureVal, humidityVal);
+  generateFakeData(hydrogenVal, alcoholVal);
   String jsonRequest = getRequest("POST",getRequestBody(motionStatus, ldrVal, hydrogenVal, alcoholVal, temperatureVal, humidityVal, timeStamp.substring(0,19)));
   Serial.println("Sending Request:"+ jsonRequest);
   //Send request to the NodeMCU using serial commmand
@@ -100,18 +101,19 @@ void loop(){
   while (!Serial1.available());
   // print the reply 
   Serial.println(Serial1.readString());
-  checkAndDisplay(motionStatus, hydrogenVal, alcoholVal, temperatureVal, humidityVal);
+  checkAndDisplay(motionStatus, hydrogenVal, alcoholVal, temperatureVal, humidityVal, ldrVal);
+  delay(500);
 
 }
 
-void generateFakeData(float &motionStatus, float &ldrVal, float &hydrogenVal, float &alcoholVal, float &temperature, float &humidity)
+void generateFakeData( float &hydrogenVal, float &alcoholVal)
 {
-  motionStatus = int(random(0,2));
-  ldrVal = int(random(0,1024));
+ // motionStatus = int(random(0,2));
+ // ldrVal = int(random(0,1024));
   hydrogenVal = int(random(200,300));
   alcoholVal =int(random(200,300));
-  temperature = int(random(0,15)); // temp in berlin aprox 
-  humidity = int(random(50,80));
+ // temperature = int(random(0,15)); // temp in berlin aprox 
+ // humidity = int(random(50,80));
   
 }
 
@@ -182,7 +184,8 @@ void printAll(float motionStatus, float hydrogenVal, float alcoholVal, float tem
   delay(delayThreshold);
 } 
 
-void checkAndDisplay(float motionStatus, float hydrogenVal, float alcoholVal, float temperatureVal, float humidityVal){
+void checkAndDisplay(float motionStatus, float hydrogenVal, float alcoholVal, float temperatureVal, float humidityVal, float ldrVal){
+  printAll(motionStatus, hydrogenVal, alcoholVal, temperatureVal, humidityVal, ldrVal);
   digitalWrite(defaultLedPin , HIGH);
 
   if (hydrogenVal>=hydrogenGasThres || alcoholVal>=alcoholGasThres ){
