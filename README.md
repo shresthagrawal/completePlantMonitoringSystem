@@ -20,4 +20,6 @@ $ sudo docker run -p 5601:5601 -p 9200:9200 -p 5044:5044 -it --rm --ulimit nofil
 
 * Wait for sometime to start the stack and then open 
 http://localhost:5601 in chrome 
+
+Asciinema: test.cast
   
